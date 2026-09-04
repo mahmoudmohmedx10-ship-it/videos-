@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- تهيئة SEO للظهور في محرك بحث جوجل -->
+    <title>منصة الفيديو - ارفع وشاهد الفيديوهات مجاناً</title>
+    <meta name="description" content="أفضل منصة لمشاركة ورفع الفيديوهات بسرعة وسهولة وبأعلى جودة.">
+    <meta name="keywords" content="فيديو, رفع فيديوهات, مشاهدة, مشاركة, منصة فيديو">
+    <meta name="robots" content="index, follow">
+
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: system-ui, -apple-system, sans-serif; background: #f0f2f5; color: #333; padding: 20px; }
+        .container { max-width: 650px; margin: 40px auto; background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); text-align: center; }
+        h1 { margin-bottom: 20px; color: #1a73e8; font-size: 24px; }
+        .upload-area { border: 2px dashed #1a73e8; border-radius: 8px; padding: 25px; margin-bottom: 20px; background: #f8faff; }
+        input[type="file"] { display: none; }
+        .custom-file-btn { background: #1a73e8; color: #fff; padding: 10px 20px; border-radius: 6px; cursor: pointer; display: inline-block; transition: 0.2s; }
+        .custom-file-btn:hover { background: #1557b0; }
+        button[type="submit"] { background: #34a853; color: white; border: none; padding: 10px 25px; border-radius: 6px; cursor: pointer; font-size: 16px; margin-top: 15px; }
+        button[type="submit"]:hover { background: #2d8e47; }
+        .video-section { margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px; }
+        .video-section h2 { font-size: 18px; margin-bottom: 15px; text-align: right; }
+        video { width: 100%; max-width: 100%; border-radius: 8px; margin-top: 15px; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>منصة رفع ومشاركة الفيديوهات</h1>
+        
+        <form id="uploadForm">
+            <div class="upload-area">
+                <label for="videoInput" class="custom-file-btn">اختر فيديو من جهازك</label>
+                <input type="file" id="videoInput" accept="video/*" required>
+                <p id="fileName" style="margin-top: 10px; font-size: 14px; color: #666;"></p>
+            </div>
+            <button type="submit">رفع الفيديو الآن</button>
+        </form>
+
+        <div class="video-section">
+            <h2>الفيديوهات المرفوعة حديثاً</h2>
+            <div id="videoContainer"></div>
+        </div>
+    </div>
+
+    <script>
+        const videoInput = document.getElementById('videoInput');
+        const fileNameDisplay = document.getElementById('fileName');
+
+        videoInput.addEventListener('change', () => {
+            if (videoInput.files.length > 0) {
+                fileNameDisplay.textContent = "الملف المحدد: " + videoInput.files[0].name;
+            }
+        });
+
+        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!videoInput.files[0]) return;
+
+            const formData = new FormData();
+            formData.append('video', videoInput.files[0]);
+
+            fileNameDisplay.textContent = "جاري الرفع...";
+
+            try {
+                const response = await fetch('/upload', { method: 'POST', body: formData });
+                const data = await response.json();
+
+                if (data.url) {
+                    const videoContainer = document.getElementById('videoContainer');
+                    const videoElement = document.createElement('video');
+                    videoElement.src = data.url;
+                    videoElement.controls = true;
+                    videoContainer.prepend(videoElement);
+                    
+                    fileNameDisplay.textContent = "تم الرفع بنجاح!";
+                    videoInput.value = '';
+                } else {
+                    fileNameDisplay.textContent = "فشل الرفع، حاول مرة أخرى.";
+                }
+            } catch (err) {
+                fileNameDisplay.textContent = "حدث خطأ في الاتصال بالسيرفر.";
+            }
+        });
+    </script>
+
+</body>
+</html>
