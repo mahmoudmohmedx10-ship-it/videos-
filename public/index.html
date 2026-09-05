@@ -1,91 +1,92 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <!-- تهيئة SEO للظهور في محرك بحث جوجل -->
-    <title>منصة الفيديو - ارفع وشاهد الفيديوهات مجاناً</title>
-    <meta name="description" content="أفضل منصة لمشاركة ورفع الفيديوهات بسرعة وسهولة وبأعلى جودة.">
-    <meta name="keywords" content="فيديو, رفع فيديوهات, مشاهدة, مشاركة, منصة فيديو">
-    <meta name="robots" content="index, follow">
-
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: system-ui, -apple-system, sans-serif; background: #f0f2f5; color: #333; padding: 20px; }
-        .container { max-width: 650px; margin: 40px auto; background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); text-align: center; }
-        h1 { margin-bottom: 20px; color: #1a73e8; font-size: 24px; }
-        .upload-area { border: 2px dashed #1a73e8; border-radius: 8px; padding: 25px; margin-bottom: 20px; background: #f8faff; }
-        input[type="file"] { display: none; }
-        .custom-file-btn { background: #1a73e8; color: #fff; padding: 10px 20px; border-radius: 6px; cursor: pointer; display: inline-block; transition: 0.2s; }
-        .custom-file-btn:hover { background: #1557b0; }
-        button[type="submit"] { background: #34a853; color: white; border: none; padding: 10px 25px; border-radius: 6px; cursor: pointer; font-size: 16px; margin-top: 15px; }
-        button[type="submit"]:hover { background: #2d8e47; }
-        .video-section { margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px; }
-        .video-section h2 { font-size: 18px; margin-bottom: 15px; text-align: right; }
-        video { width: 100%; max-width: 100%; border-radius: 8px; margin-top: 15px; }
-    </style>
+  <meta charset="UTF-8">
+  <title>منصة الفيديوهات</title>
+  <style>
+    body { font-family: sans-serif; background: #121212; color: white; padding: 20px; text-align: center; }
+    .upload-box { background: #1e1e1e; padding: 20px; border-radius: 10px; max-width: 500px; margin: 20px auto; display: none; }
+    input, button { padding: 10px; margin: 10px 0; width: 80%; border-radius: 5px; border: none; }
+    button { background: #0070f3; color: white; cursor: pointer; font-weight: bold; }
+    .video-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; margin-top: 30px; }
+    video { width: 100%; max-width: 400px; border-radius: 10px; }
+  </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>منصة رفع ومشاركة الفيديوهات</h1>
-        
-        <form id="uploadForm">
-            <div class="upload-area">
-                <label for="videoInput" class="custom-file-btn">اختر فيديو من جهازك</label>
-                <input type="file" id="videoInput" accept="video/*" required>
-                <p id="fileName" style="margin-top: 10px; font-size: 14px; color: #666;"></p>
-            </div>
-            <button type="submit">رفع الفيديو الآن</button>
-        </form>
+  <h1>موقع الفيديوهات الخاص بي</h1>
 
-        <div class="video-section">
-            <h2>الفيديوهات المرفوعة حديثاً</h2>
-            <div id="videoContainer"></div>
-        </div>
-    </div>
+  <!-- زر مخفي لدخول صاحب الموقع -->
+  <button onclick="checkAdmin()">لوحة رفع فيديو جديد 🔒</button>
 
-    <script>
-        const videoInput = document.getElementById('videoInput');
-        const fileNameDisplay = document.getElementById('fileName');
+  <!-- نموذج الرفع المباشر -->
+  <div id="uploadBox" class="upload-box">
+    <h3>رفع فيديو جديد</h3>
+    <input type="file" id="videoFile" accept="video/*">
+    <button onclick="uploadVideo()">رفع الفيديو الآن 🚀</button>
+    <p id="status"></p>
+  </div>
 
-        videoInput.addEventListener('change', () => {
-            if (videoInput.files.length > 0) {
-                fileNameDisplay.textContent = "الملف المحدد: " + videoInput.files[0].name;
-            }
+  <!-- مكان عرض الفيديوهات -->
+  <div class="video-container" id="videoList">
+    <!-- ستظهر الفيديوهات المرفوعة هنا -->
+  </div>
+
+  <script>
+    // اكتب بياناتك من حساب Cloudinary هنا
+    const CLOUD_NAME = "qozdlq6n"; 
+    const UPLOAD_PRESET = "xnxx.com"; 
+    const ADMIN_PASSWORD = "2612006"; // كلمة السر الخاصة بك لدخول لوحة الرفع
+
+    function checkAdmin() {
+      const pass = prompt("أدخل كلمة السر الخاصة بصاحب الموقع:");
+      if (pass === ADMIN_PASSWORD) {
+        document.getElementById('uploadBox').style.display = 'block';
+      } else {
+        alert("كلمة السر غير صحيحة!");
+      }
+    }
+
+    async function uploadVideo() {
+      const fileInput = document.getElementById('videoFile');
+      const status = document.getElementById('status');
+      
+      if (!fileInput.files[0]) {
+        alert("برجاء اختيار فيديو أولاً");
+        return;
+      }
+
+      status.innerText = "جاري رفع الفيديو... يرجى الانتظار";
+
+      const formData = new FormData();
+      formData.append('file', fileInput.files[0]);
+      formData.append('upload_preset', UPLOAD_PRESET);
+
+      try {
+        const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/video/upload`, {
+          method: 'POST',
+          body: formData
         });
+        const data = await res.json();
 
-        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            if (!videoInput.files[0]) return;
+        if (data.secure_url) {
+          status.innerText = "تم رفع الفيديو بنجاح! 🎉";
+          addVideoToPage(data.secure_url);
+        } else {
+          status.innerText = "حدث خطأ أثناء الرفع!";
+        }
+      } catch (err) {
+        status.innerText = "فشل الاتصال بالخادم!";
+      }
+    }
 
-            const formData = new FormData();
-            formData.append('video', videoInput.files[0]);
-
-            fileNameDisplay.textContent = "جاري الرفع...";
-
-            try {
-                const response = await fetch('/upload', { method: 'POST', body: formData });
-                const data = await response.json();
-
-                if (data.url) {
-                    const videoContainer = document.getElementById('videoContainer');
-                    const videoElement = document.createElement('video');
-                    videoElement.src = data.url;
-                    videoElement.controls = true;
-                    videoContainer.prepend(videoElement);
-                    
-                    fileNameDisplay.textContent = "تم الرفع بنجاح!";
-                    videoInput.value = '';
-                } else {
-                    fileNameDisplay.textContent = "فشل الرفع، حاول مرة أخرى.";
-                }
-            } catch (err) {
-                fileNameDisplay.textContent = "حدث خطأ في الاتصال بالسيرفر.";
-            }
-        });
-    </script>
-
+    function addVideoToPage(url) {
+      const videoList = document.getElementById('videoList');
+      const videoTag = document.createElement('video');
+      videoTag.src = url;
+      videoTag.controls = true;
+      videoList.appendChild(videoTag);
+    }
+  </script>
 </body>
 </html>
