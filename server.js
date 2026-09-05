@@ -1,58 +1,74 @@
 const express = require('express');
-const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const multer = require('multer');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// إنشاء مجلد التخزين تلقائياً
-const uploadDir = path.join(__dirname, 'public/uploads');
-if (!fs.existsSync(uploadDir)) {
+// إعداد مجلد رفع الملفات للعمل في بيئة Vercel المقتصرة على القراءة فقط (Read-Only)
+// نستخدم المجلد المؤقت /tmp المسموح بالكتابة فيه
+const uploadDir = path.join('/tmp', 'uploads');
+try {
+  if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true });
+  }
+} catch (err) {
+  console.log('Read-only filesystem detected, skipping local folder creation.');
 }
 
-// إعدادات رفع الملفات
+// إعداد Multer لتخزين الملفات في المجلد المؤقت
 const storage = multer.diskStorage({
-    destination: (req, file, cb) => cb(null, uploadDir),
-    filename: (req, file, cb) => {
-        const uniqueName = Date.now() + '-' + Math.round(Math.random() * 1E9) + path.extname(file.originalname);
-        cb(null, uniqueName);
-    }
+  destination: (req, file, cb) => {
+    cb(null, uploadDir);
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + path.extname(file.originalname));
+  }
 });
 
-const upload = multer({ storage });
+const upload = multer({ storage: storage });
 
-// إتاحة الوصول للملفات العامة
-app.use(express.static('public'));
+// الميدل وير الأساسية
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// مسار رفع الفيديو
-app.post('/upload', upload.single('video'), (req, res) => {
-    if (!req.file) {
-        return res.status(400).json({ error: 'يرجى اختيار فيديو للرفع' });
-    }
-    res.json({ url: `/uploads/${req.file.filename}` });
-});
+// خادم الملفات الثابتة (Static Files)
+app.use(express.static(path.join(__dirname, 'public')));
+app.use('/uploads', express.static(uploadDir));
 
-// ملف خريطة الموقع للظهور في جوجل (Sitemap)
-app.get('/sitemap.xml', (req, res) => {
-    res.type('application/xml');
-    res.send(`<?xml version="1.0" encoding="UTF-8"?>
-    <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-      <url>
-        <loc>https://${req.get('host')}/</loc>
-        <priority>1.0</priority>
-      </url>
-    </urlset>`);
-});
-
-// ملف تعليمات عناكب البحث (Robots.txt)
+// إعداد ملف Robots.txt ومحركات البحث
 app.get('/robots.txt', (req, res) => {
-    res.type('text/plain');
-    res.send(`User-agent: *\nAllow: /\nSitemap: https://${req.get('host')}/sitemap.xml`);
+  res.type('text/plain');
+  res.send(`User-agent: *\nAllow: /\nSitemap: https://${req.get('host')}/sitemap.xml`);
 });
 
-app.listen(PORT, () => {
-    console.log(`Server connected on port ${PORT}`);
+// إعداد ملف Sitemap.xml
+app.get('/sitemap.xml', (req, res) => {
+  res.type('application/xml');
+  res.send(`<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemap.index/schemas/sitemap/0.9">
+  <url>
+    <loc>https://${req.get('host')}/</loc>
+    <priority>1.0</priority>
+  </url>
+</urlset>`);
 });
+
+// المسار الرئيسي لتشغيل تطبيقك
+app.get('/', (req, res) => {
+  const indexPath = path.join(__dirname, 'public', 'index.html');
+  if (fs.existsSync(indexPath)) {
+    res.sendFile(indexPath);
+  } else {
+    res.send('Server is running successfully on Vercel!');
+  }
+});
+
+// تشغيل السيرفر محلياً
+app.listen(PORT, () => {
+  console.log(`Server connected on port ${PORT}`);
+});
+
+// أهم سطر لتشغيل السيرفر على Vercel بدون أخطاء
 module.exports = app;
