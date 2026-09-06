@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <!-- علامة إثبات ملكية جوجل Search Console -->
-  <<meta name="google-site-verification" content="s6GwQsjyQhOpNgcUEkYiRdQp52VQd_x-IbNBHZLCXE0" />"
+  <meta name="google-site-verification" content="s6GwQsjyQhOpNg" />
 
   <title>منصة الفيديوهات الحصرية</title>
   <style>
@@ -95,64 +95,65 @@
     <!-- ستظهر الفيديوهات هنا تلقائياً -->
   </div>
 
-<script>
-  const CLOUD_NAME = "qozd1q6ri"; 
-  const UPLOAD_PRESET = "xnxx.com"; 
-  const ADMIN_PASSWORD = "2612006";
+  <script>
+    const CLOUD_NAME = "qozd1q6ri"; 
+    const UPLOAD_PRESET = "xnxx.com"; 
+    const API_KEY = "275811776949318";
+    const ADMIN_PASSWORD = "2612006";
 
-  function checkAdmin() {
-    const pass = prompt("أدخل كلمة السر الخاصة بصاحب الموقع:");
-    if (pass === ADMIN_PASSWORD) {
-      document.getElementById('uploadBox').style.display = 'block';
-    } else if (pass !== null) {
-      alert("كلمة السر غير صحيحة!");
-    }
-  }
-
-  async function uploadVideo() {
-    const fileInput = document.getElementById('videoFile');
-    const status = document.getElementById('status');
-    
-    if (!fileInput.files[0]) {
-      alert("برجاء اختيار ملف فيديو أولاً");
-      return;
-    }
-
-    status.innerText = "جاري رفع الفيديو... يرجى الانتظار عدم إغلاق الصفحة";
-
-    const formData = new FormData();
-    formData.append('file', fileInput.files[0]);
-    formData.append('upload_preset', UPLOAD_PRESET);
-    formData.append('resource_type', 'video'); // تحديد نوع الملف للرفع السريع
-
-    try {
-      const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/auto/upload`, {
-        method: 'POST',
-        body: formData
-      });
-      
-      const data = await res.json();
-
-      if (data.secure_url) {
-        status.innerText = "تم رفع الفيديو بنجاح! 🎉";
-        addVideoToPage(data.secure_url);
-        fileInput.value = "";
-      } else {
-        console.error(data);
-        status.innerText = "فشل الرفع: " + (data.error ? data.error.message : "تأكد من الحجم");
+    function checkAdmin() {
+      const pass = prompt("أدخل كلمة السر الخاصة بصاحب الموقع:");
+      if (pass === ADMIN_PASSWORD) {
+        document.getElementById('uploadBox').style.display = 'block';
+      } else if (pass !== null) {
+        alert("كلمة السر غير صحيحة!");
       }
-    } catch (err) {
-      status.innerText = "حدث خطأ أثناء الاتصال بالشبكة!";
     }
-  }
 
-  function addVideoToPage(url) {
-    const videoList = document.getElementById('videoList');
-    const videoCard = document.createElement('div');
-    videoCard.innerHTML = `<video src="${url}" controls preload="metadata"></video>`;
-    videoList.prepend(videoCard);
-  }
-</script>
+    async function uploadVideo() {
+      const fileInput = document.getElementById('videoFile');
+      const status = document.getElementById('status');
+      
+      if (!fileInput.files[0]) {
+        alert("برجاء اختيار ملف فيديو أولاً");
+        return;
+      }
+
+      status.innerText = "جاري رفع الفيديو... يرجى الانتظار";
+
+      const formData = new FormData();
+      formData.append('file', fileInput.files[0]);
+      formData.append('upload_preset', UPLOAD_PRESET);
+      formData.append('api_key', API_KEY);
+
+      try {
+        const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/video/upload`, {
+          method: 'POST',
+          body: formData
+        });
+        
+        const data = await res.json();
+
+        if (data.secure_url) {
+          status.innerText = "تم رفع الفيديو بنجاح! 🎉";
+          addVideoToPage(data.secure_url);
+          fileInput.value = "";
+        } else {
+          console.error(data);
+          status.innerText = "فشل الرفع: " + (data.error ? data.error.message : "حدث خطأ غير متوقع");
+        }
+      } catch (err) {
+        status.innerText = "حدث خطأ أثناء الاتصال بالشبكة!";
+      }
+    }
+
+    function addVideoToPage(url) {
+      const videoList = document.getElementById('videoList');
+      const videoCard = document.createElement('div');
+      videoCard.innerHTML = `<video src="${url}" controls preload="metadata"></video>`;
+      videoList.prepend(videoCard);
+    }
+  </script>
 
 </body>
 </html>
