@@ -98,7 +98,6 @@
   <script>
     const CLOUD_NAME = "qozd1q6ri"; 
     const UPLOAD_PRESET = "xnxx.com"; 
-    const API_KEY = "275811776949318";
     const ADMIN_PASSWORD = "2612006";
 
     function checkAdmin() {
@@ -124,7 +123,6 @@
       const formData = new FormData();
       formData.append('file', fileInput.files[0]);
       formData.append('upload_preset', UPLOAD_PRESET);
-      formData.append('api_key', API_KEY);
 
       try {
         const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/video/upload`, {
