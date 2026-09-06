@@ -95,62 +95,64 @@
     <!-- ستظهر الفيديوهات هنا تلقائياً -->
   </div>
 
-  <script>
-    // إعدادات Cloudinary والموقع
-    const CLOUD_NAME = "qozd1q6ri"; 
-    const UPLOAD_PRESET = "xnxx.com"; 
-    const ADMIN_PASSWORD = "2612006"; // كلمة سر لوحة الرفع
+<script>
+  const CLOUD_NAME = "qozd1q6ri"; 
+  const UPLOAD_PRESET = "xnxx.com"; 
+  const ADMIN_PASSWORD = "2612006";
 
-    function checkAdmin() {
-      const pass = prompt("أدخل كلمة السر الخاصة بصاحب الموقع:");
-      if (pass === ADMIN_PASSWORD) {
-        document.getElementById('uploadBox').style.display = 'block';
-      } else if (pass !== null) {
-        alert("كلمة السر غير صحيحة!");
-      }
+  function checkAdmin() {
+    const pass = prompt("أدخل كلمة السر الخاصة بصاحب الموقع:");
+    if (pass === ADMIN_PASSWORD) {
+      document.getElementById('uploadBox').style.display = 'block';
+    } else if (pass !== null) {
+      alert("كلمة السر غير صحيحة!");
+    }
+  }
+
+  async function uploadVideo() {
+    const fileInput = document.getElementById('videoFile');
+    const status = document.getElementById('status');
+    
+    if (!fileInput.files[0]) {
+      alert("برجاء اختيار ملف فيديو أولاً");
+      return;
     }
 
-    async function uploadVideo() {
-      const fileInput = document.getElementById('videoFile');
-      const status = document.getElementById('status');
+    status.innerText = "جاري رفع الفيديو... يرجى الانتظار عدم إغلاق الصفحة";
+
+    const formData = new FormData();
+    formData.append('file', fileInput.files[0]);
+    formData.append('upload_preset', UPLOAD_PRESET);
+    formData.append('resource_type', 'video'); // تحديد نوع الملف للرفع السريع
+
+    try {
+      const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/auto/upload`, {
+        method: 'POST',
+        body: formData
+      });
       
-      if (!fileInput.files[0]) {
-        alert("برجاء اختيار ملف فيديو أولاً");
-        return;
+      const data = await res.json();
+
+      if (data.secure_url) {
+        status.innerText = "تم رفع الفيديو بنجاح! 🎉";
+        addVideoToPage(data.secure_url);
+        fileInput.value = "";
+      } else {
+        console.error(data);
+        status.innerText = "فشل الرفع: " + (data.error ? data.error.message : "تأكد من الحجم");
       }
-
-      status.innerText = "جاري رفع الفيديو إلى السحابة... يرجى الانتظار";
-
-      const formData = new FormData();
-      formData.append('file', fileInput.files[0]);
-      formData.append('upload_preset', UPLOAD_PRESET);
-
-      try {
-        const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/video/upload`, {
-          method: 'POST',
-          body: formData
-        });
-        const data = await res.json();
-
-        if (data.secure_url) {
-          status.innerText = "تم رفع الفيديو بنجاح! 🎉";
-          addVideoToPage(data.secure_url);
-          fileInput.value = "";
-        } else {
-          status.innerText = "حدث خطأ أثناء الرفع! تأكد من إعدادات Cloudinary";
-        }
-      } catch (err) {
-        status.innerText = "فشل الاتصال بـ Cloudinary!";
-      }
+    } catch (err) {
+      status.innerText = "حدث خطأ أثناء الاتصال بالشبكة!";
     }
+  }
 
-    function addVideoToPage(url) {
-      const videoList = document.getElementById('videoList');
-      const videoCard = document.createElement('div');
-      videoCard.innerHTML = `<video src="${url}" controls></video>`;
-      videoList.prepend(videoCard);
-    }
-  </script>
+  function addVideoToPage(url) {
+    const videoList = document.getElementById('videoList');
+    const videoCard = document.createElement('div');
+    videoCard.innerHTML = `<video src="${url}" controls preload="metadata"></video>`;
+    videoList.prepend(videoCard);
+  }
+</script>
 
 </body>
 </html>
