@@ -2,47 +2,110 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <title>منصة الفيديوهات</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- علامة إثبات ملكية جوجل Search Console -->
+  <meta name="google-site-verification" content="s6GwQsjyQhOpNg" />
+
+  <title>منصة الفيديوهات الحصرية</title>
   <style>
-    body { font-family: sans-serif; background: #121212; color: white; padding: 20px; text-align: center; }
-    .upload-box { background: #1e1e1e; padding: 20px; border-radius: 10px; max-width: 500px; margin: 20px auto; display: none; }
-    input, button { padding: 10px; margin: 10px 0; width: 80%; border-radius: 5px; border: none; }
-    button { background: #0070f3; color: white; cursor: pointer; font-weight: bold; }
-    .video-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; margin-top: 30px; }
-    video { width: 100%; max-width: 400px; border-radius: 10px; }
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background-color: #121212;
+      color: #ffffff;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+    }
+    header {
+      margin-bottom: 30px;
+    }
+    .admin-btn {
+      background-color: #238636;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-size: 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .admin-btn:hover {
+      background-color: #2ea043;
+    }
+    .upload-box {
+      background-color: #161b22;
+      border: 1px solid #30363d;
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 450px;
+      margin: 20px auto;
+      display: none;
+    }
+    input[type="file"] {
+      margin: 15px 0;
+      color: #8b949e;
+    }
+    .upload-btn {
+      background-color: #0070f3;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      width: 100%;
+    }
+    .status-text {
+      margin-top: 10px;
+      font-size: 14px;
+      color: #58a6ff;
+    }
+    .video-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+      max-width: 1200px;
+      margin: 30px auto;
+    }
+    video {
+      width: 100%;
+      border-radius: 8px;
+      background-color: #000;
+    }
   </style>
 </head>
 <body>
 
-  <h1>موقع الفيديوهات الخاص بي</h1>
+  <header>
+    <h1>منصة الفيديوهات</h1>
+    <button class="admin-btn" onclick="checkAdmin()">لوحة رفع فيديو جديد 🔒</button>
+  </header>
 
-  <!-- زر مخفي لدخول صاحب الموقع -->
-  <button onclick="checkAdmin()">لوحة رفع فيديو جديد 🔒</button>
-
-  <!-- نموذج الرفع المباشر -->
+  <!-- صندوق الرفع الخاص بصاحب الموقع -->
   <div id="uploadBox" class="upload-box">
     <h3>رفع فيديو جديد</h3>
     <input type="file" id="videoFile" accept="video/*">
-    <button onclick="uploadVideo()">رفع الفيديو الآن 🚀</button>
-    <p id="status"></p>
+    <button class="upload-btn" onclick="uploadVideo()">رفع الفيديو الآن 🚀</button>
+    <div id="status" class="status-text"></div>
   </div>
 
-  <!-- مكان عرض الفيديوهات -->
-  <div class="video-container" id="videoList">
-    <!-- ستظهر الفيديوهات المرفوعة هنا -->
+  <!-- عرض الفيديوهات المرفوعة -->
+  <div class="video-grid" id="videoList">
+    <!-- ستظهر الفيديوهات هنا تلقائياً -->
   </div>
 
   <script>
-    // اكتب بياناتك من حساب Cloudinary هنا
-    const CLOUD_NAME = "qozdlq6n"; 
+    // إعدادات Cloudinary والموقع
+    const CLOUD_NAME = "qozd1q6ri"; 
     const UPLOAD_PRESET = "xnxx.com"; 
-    const ADMIN_PASSWORD = "2612006"; // كلمة السر الخاصة بك لدخول لوحة الرفع
+    const ADMIN_PASSWORD = "2612006"; // كلمة سر لوحة الرفع
 
     function checkAdmin() {
       const pass = prompt("أدخل كلمة السر الخاصة بصاحب الموقع:");
       if (pass === ADMIN_PASSWORD) {
         document.getElementById('uploadBox').style.display = 'block';
-      } else {
+      } else if (pass !== null) {
         alert("كلمة السر غير صحيحة!");
       }
     }
@@ -52,11 +115,11 @@
       const status = document.getElementById('status');
       
       if (!fileInput.files[0]) {
-        alert("برجاء اختيار فيديو أولاً");
+        alert("برجاء اختيار ملف فيديو أولاً");
         return;
       }
 
-      status.innerText = "جاري رفع الفيديو... يرجى الانتظار";
+      status.innerText = "جاري رفع الفيديو إلى السحابة... يرجى الانتظار";
 
       const formData = new FormData();
       formData.append('file', fileInput.files[0]);
@@ -72,21 +135,22 @@
         if (data.secure_url) {
           status.innerText = "تم رفع الفيديو بنجاح! 🎉";
           addVideoToPage(data.secure_url);
+          fileInput.value = "";
         } else {
-          status.innerText = "حدث خطأ أثناء الرفع!";
+          status.innerText = "حدث خطأ أثناء الرفع! تأكد من إعدادات Cloudinary";
         }
       } catch (err) {
-        status.innerText = "فشل الاتصال بالخادم!";
+        status.innerText = "فشل الاتصال بـ Cloudinary!";
       }
     }
 
     function addVideoToPage(url) {
       const videoList = document.getElementById('videoList');
-      const videoTag = document.createElement('video');
-      videoTag.src = url;
-      videoTag.controls = true;
-      videoList.appendChild(videoTag);
+      const videoCard = document.createElement('div');
+      videoCard.innerHTML = `<video src="${url}" controls></video>`;
+      videoList.prepend(videoCard);
     }
   </script>
+
 </body>
 </html>
