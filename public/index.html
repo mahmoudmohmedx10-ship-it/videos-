@@ -3,10 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <!-- علامة إثبات ملكية جوجل Search Console -->
   <meta name="google-site-verification" content="s6GwQsjyQhOpNg" />
-
   <title>منصة الفيديوهات الحصرية</title>
   <style>
     body {
@@ -17,9 +14,7 @@
       padding: 20px;
       text-align: center;
     }
-    header {
-      margin-bottom: 30px;
-    }
+    header { margin-bottom: 30px; }
     .admin-btn {
       background-color: #238636;
       color: white;
@@ -30,9 +25,6 @@
       cursor: pointer;
       font-weight: bold;
     }
-    .admin-btn:hover {
-      background-color: #2ea043;
-    }
     .upload-box {
       background-color: #161b22;
       border: 1px solid #30363d;
@@ -42,10 +34,7 @@
       margin: 20px auto;
       display: none;
     }
-    input[type="file"] {
-      margin: 15px 0;
-      color: #8b949e;
-    }
+    input[type="file"] { margin: 15px 0; color: #8b949e; }
     .upload-btn {
       background-color: #0070f3;
       color: white;
@@ -56,11 +45,7 @@
       font-weight: bold;
       width: 100%;
     }
-    .status-text {
-      margin-top: 10px;
-      font-size: 14px;
-      color: #58a6ff;
-    }
+    .status-text { margin-top: 10px; font-size: 14px; color: #58a6ff; }
     .video-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -68,11 +53,7 @@
       max-width: 1200px;
       margin: 30px auto;
     }
-    video {
-      width: 100%;
-      border-radius: 8px;
-      background-color: #000;
-    }
+    video { width: 100%; border-radius: 8px; background-color: #000; }
   </style>
 </head>
 <body>
@@ -82,7 +63,6 @@
     <button class="admin-btn" onclick="checkAdmin()">لوحة رفع فيديو جديد 🔒</button>
   </header>
 
-  <!-- صندوق الرفع الخاص بصاحب الموقع -->
   <div id="uploadBox" class="upload-box">
     <h3>رفع فيديو جديد</h3>
     <input type="file" id="videoFile" accept="video/*">
@@ -90,14 +70,12 @@
     <div id="status" class="status-text"></div>
   </div>
 
-  <!-- عرض الفيديوهات المرفوعة -->
-  <div class="video-grid" id="videoList">
-    <!-- ستظهر الفيديوهات هنا تلقائياً -->
-  </div>
+  <div class="video-grid" id="videoList"></div>
 
   <script>
+    // ⚠️ استبدل القيم هنا بالبيانات الصحيحة المنسوخة من حسابك بالضبط
     const CLOUD_NAME = "qozd1q6ri"; 
-    const UPLOAD_PRESET = "myb videos xn"; 
+    const UPLOAD_PRESET = "my_video_preset"; 
     const ADMIN_PASSWORD = "2612006";
 
     function checkAdmin() {
@@ -118,14 +96,14 @@
         return;
       }
 
-      status.innerText = "جاري رفع الفيديو... يرجى الانتظار";
+      status.innerText = "جاري رفع الفيديو... يرجى الانتظار عدم إغلاق الصفحة";
 
       const formData = new FormData();
       formData.append('file', fileInput.files[0]);
       formData.append('upload_preset', UPLOAD_PRESET);
 
       try {
-        const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/video/upload`, {
+        const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/upload`, {
           method: 'POST',
           body: formData
         });
@@ -138,7 +116,7 @@
           fileInput.value = "";
         } else {
           console.error(data);
-          status.innerText = "فشل الرفع: " + (data.error ? data.error.message : "حدث خطأ غير متوقع");
+          status.innerText = "فشل الرفع: " + (data.error ? data.error.message : "خطأ غير معروف");
         }
       } catch (err) {
         status.innerText = "حدث خطأ أثناء الاتصال بالشبكة!";
